@@ -30,7 +30,27 @@ namespace Collections.Tasks {
         /// </example>
         public static IEnumerable<int> GetFibonacciSequence(int count) {
             // TODO : Implement Fibonacci sequence generator
-            throw new NotImplementedException();
+            try
+            {
+                List<int> temp = new List<int>(count);
+                if (count > 1)
+                {
+                    temp.Add(1); temp.Add(1);
+                    for (int i = 0; i < count - 2; i++)
+                    {
+                        temp.Add(temp[i] + temp[i + 1]);
+                    }
+                }
+                else if (count == 1)
+                    temp.Add(1);
+                return temp;
+            }
+            catch
+            {
+                System.ArgumentException argEx = new System.ArgumentException();
+                throw argEx;
+            }
+            // throw new NotImplementedException();
         }
 
         /// <summary>
@@ -48,7 +68,16 @@ namespace Collections.Tasks {
         public static IEnumerable<string> Tokenize(TextReader reader) {
             char[] delimeters = new[] { ',', ' ', '.', '\t', '\n' };
             // TODO : Implement the tokenizer
-            throw new NotImplementedException();
+            if (reader == null)
+                throw new System.ArgumentNullException();
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] words = line.Split(delimeters, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string word in words)
+                    yield return word;
+            }
+            //throw new NotImplementedException();
         }
 
 
@@ -76,7 +105,20 @@ namespace Collections.Tasks {
         /// </example>
         public static IEnumerable<T> DepthTraversalTree<T>(ITreeNode<T> root) {
             // TODO : Implement the tree depth traversal algorithm
-            throw new NotImplementedException(); 
+            if (root == null)
+                throw new ArgumentNullException();
+            List<ITreeNode<T>> tree = new List<ITreeNode<T>>();
+            tree.Add(root);
+            while (tree.Count > 0)
+            {
+                ITreeNode<T> node = tree[tree.Count - 1];
+                tree.RemoveAt(tree.Count - 1);
+                yield return node.Data;
+                if (node.Children != null)
+                    foreach (var nodeChildren in node.Children)
+                        tree.Add(nodeChildren);
+            }
+            //throw new NotImplementedException(); 
         }
 
         /// <summary>
@@ -153,7 +195,16 @@ namespace Collections.Tasks {
         /// </example>
         public static TValue GetOrBuildValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> builder) {
             // TODO : Implement GetOrBuildValue method for cache
-            throw new NotImplementedException();
+            if (dictionary.ContainsKey(key))
+            {
+                return dictionary[key];
+            }
+            else
+            {
+                dictionary.Add(key, builder.Invoke());
+                return builder.Invoke();
+            }
+            //throw new NotImplementedException();
         }
 
     }
