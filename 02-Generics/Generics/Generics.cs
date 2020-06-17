@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Net;
+using System.Reflection;
 
 namespace Task.Generics {
 
@@ -24,7 +28,20 @@ namespace Task.Generics {
 		/// </example>
 		public static string ConvertToString<T>(this IEnumerable<T> list) {
 			// TODO : Implement ConvertToString<T>
-			throw new NotImplementedException();
+			var ResultString = "";
+			var LengthofList = list.Count();
+			var iteration = 0;
+			foreach (var item in list)
+			{
+				ResultString += item.ToString();
+				iteration++;
+				if (iteration != LengthofList)
+				{
+					ResultString += ListSeparator;
+				}
+			}
+			return ResultString;
+			//throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -46,7 +63,12 @@ namespace Task.Generics {
 		public static IEnumerable<T> ConvertToList<T>(this string list) {
 			// TODO : Implement ConvertToList<T>
 			// HINT : Use TypeConverter.ConvertFromString method to parse string value
-			throw new NotImplementedException();
+			String[] strlist = list.Split(ListSeparator);
+			foreach (String s in strlist)
+			{
+				yield return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromString(s);
+			}
+			//throw new NotImplementedException();
 		}
 
 	}
@@ -62,7 +84,20 @@ namespace Task.Generics {
 		/// <param name="index2">second index</param>
 		public static void SwapArrayElements<T>(this T[] array, int index1, int index2) {
 			// TODO : Implement SwapArrayElements<T>
-			throw new NotImplementedException();
+			var value_index1 = array[index1];
+			var value_index2 = array[index2];
+			for (int i = 0; i < array.Length; i++)
+			{
+				if (i == index1)
+				{
+					array[i] = value_index2;
+				}
+				if (i == index2)
+				{
+					array[i] = value_index1;
+				}
+			}
+			//throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -107,9 +142,27 @@ namespace Task.Generics {
 	/// </example>
 	public static class Singleton<T> {
 		// TODO : Implement generic singleton class 
+		private static Lazy<T> instance_ = new Lazy<T>();
 
-		public static T Instance {
-			get { throw new NotImplementedException(); }
+		private static Lazy<T> CreateInstance()
+		{
+			ConstructorInfo cInfo = typeof(T).GetConstructor(
+				BindingFlags.Instance | BindingFlags.NonPublic,
+				null,
+				new Type[0],
+				new System.Reflection.ParameterModifier[0]);
+			return (Lazy<T>)cInfo.Invoke(null);
+		}
+
+		public static T Instance
+		{
+			get
+			{
+				if (instance_ == null)
+					instance_ = CreateInstance();
+				return instance_.Value;
+				//throw new NotImplementedException(); 
+			}
 		}
 	}
 
@@ -136,7 +189,16 @@ namespace Task.Generics {
 		/// </example>
 		public static T TimeoutSafeInvoke<T>(this Func<T> function) {
 			// TODO : Implement TimeoutSafeInvoke<T>
-			throw new NotImplementedException();
+			try
+			{
+				T temp = function.Invoke();
+				return temp;
+			}
+			catch (WebException)
+			{
+				throw new WebException("The operation has timed out", WebExceptionStatus.Timeout);
+			}
+			//throw new NotImplementedException();
 		}
 
 
@@ -165,7 +227,17 @@ namespace Task.Generics {
 		/// </example>
 		public static Predicate<T> CombinePredicates<T>(Predicate<T>[] predicates) {
 			// TODO : Implement CombinePredicates<T>
-			throw new NotImplementedException();
+			return delegate (T item)
+			{
+				foreach (var predicate in predicates)
+				{
+					if (!predicate(item))
+					{
+						return false;
+					}
+				}
+				return true;
+			};
 		}
 
 	}
